@@ -50,63 +50,107 @@ $recent_logs_result = mysqli_query($conn, $recent_logs_sql);
 closeDBConnection($conn);
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - UniFreelance</title>
+    <link rel="stylesheet" href="/unifreelance/frontend/assets/css/admin.css">
 </head>
+
 <body>
-    <h1>Admin Dashboard</h1>
-    <p>Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!</p>
-    
-    <!-- Quick Stats -->
-    <div>
-        <h2>Platform Statistics</h2>
-        <div>
-            <p>Total Students: <?php echo $stats['student_count'] ?? 0; ?></p>
-            <p>Total Clients: <?php echo $stats['client_count'] ?? 0; ?></p>
-            <p>Active Jobs: <?php echo $stats['jobs_in_progress_count'] ?? 0; ?></p>
-            <p>Completed Jobs: <?php echo $stats['jobs_completed_count'] ?? 0; ?></p>
-            <p>Pending Verifications: <?php echo $stats['pending_verifications']; ?></p>
-            <p>Total Platform Revenue: $<?php echo number_format($stats['total_payments'] * 0.10, 2); ?> (10% fee)</p>
-        </div>
-    </div>
-    
-    <!-- Navigation -->
-    <nav>
-        <h3>Admin Menu</h3>
-        <ul>
-            <li><a href="create_admin.php">Create New Admin</a></li>
-            <li><a href="users.php">Manage Users</a></li>
-            <li><a href="jobs.php">Manage Jobs</a></li>
-            <li><a href="disputes.php">Manage Disputes</a></li>
-            <li><a href="payments.php">Payment History</a></li>
-            <li><a href="logs.php">System Logs</a></li>
-            <li><a href="settings.php">Settings</a></li>
-            <li><a href="logout.php">Logout</a></li>
-        </ul>
-    </nav>
-    
-    <!-- Recent Activities -->
-    <div>
-        <h2>Recent Activities</h2>
-        <table border="1">
-            <tr>
-                <th>User</th>
-                <th>Action</th>
-                <th>Details</th>
-                <th>IP Address</th>
-                <th>Timestamp</th>
-            </tr>
-            <?php while ($log = mysqli_fetch_assoc($recent_logs_result)): ?>
-                <tr>
-                    <td><?php echo htmlspecialchars($log['username'] ?? 'System'); ?></td>
-                    <td><?php echo htmlspecialchars($log['action']); ?></td>
-                    <td><?php echo htmlspecialchars($log['details']); ?></td>
-                    <td><?php echo htmlspecialchars($log['ip_address']); ?></td>
-                    <td><?php echo date('Y-m-d H:i:s', strtotime($log['created_at'])); ?></td>
-                </tr>
-            <?php endwhile; ?>
-        </table>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <h3>☰ Admin Panel</h3>
+            <ul>
+                <li><a href="/unifreelance/" target="_blank">🏠 Home</a></li>
+                <li><a href="dashboard.php"><strong>Dashboard</strong></a></li>
+                <li><a href="create_admin.php">Create Admin</a></li>
+                <li><a href="users.php">Manage Users</a></li>
+                <li><a href="jobs.php">Manage Jobs</a></li>
+                <li><a href="disputes.php">Manage Disputes</a></li>
+                <li><a href="payments.php">Payments</a></li>
+                <li><a href="logs.php">System Logs</a></li>
+                <li><a href="settings.php">Settings</a></li>
+                <li><a href="logout.php" class="logout-btn">Logout</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="header">
+                <div>
+                    <h1>Admin Dashboard</h1>
+                </div>
+                <div class="header-info">
+                    <p>Welcome, <strong><?php echo htmlspecialchars($_SESSION['username']); ?></strong></p>
+                    <p><?php echo date('F j, Y'); ?></p>
+                </div>
+            </div>
+
+            <!-- Platform Statistics -->
+            <div>
+                <h2 class="section-title">Platform Statistics</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Total Students</div>
+                        <div class="stat-value"><?php echo $stats['student_count'] ?? 0; ?></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Total Clients</div>
+                        <div class="stat-value"><?php echo $stats['client_count'] ?? 0; ?></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Active Jobs</div>
+                        <div class="stat-value"><?php echo $stats['jobs_in_progress_count'] ?? 0; ?></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Completed Jobs</div>
+                        <div class="stat-value"><?php echo $stats['jobs_completed_count'] ?? 0; ?></div>
+                    </div>
+                    <div class="stat-card" style="border-left-color: var(--warning-color);">
+                        <div class="stat-label">Pending Verifications</div>
+                        <div class="stat-value" style="color: var(--warning-color);"><?php echo $stats['pending_verifications']; ?></div>
+                    </div>
+                    <div class="stat-card" style="border-left-color: var(--success-color);">
+                        <div class="stat-label">Platform Revenue (10%)</div>
+                        <div class="stat-value" style="color: var(--success-color);">$<?php echo number_format($stats['total_payments'] * 0.10, 2); ?></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activities -->
+            <div>
+                <h2 class="section-title">Recent Activities</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Action</th>
+                                <th>Details</th>
+                                <th>IP Address</th>
+                                <th>Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php while ($log = mysqli_fetch_assoc($recent_logs_result)): ?>
+                                <tr>
+                                    <td><?php echo htmlspecialchars($log['username'] ?? 'System'); ?></td>
+                                    <td><?php echo htmlspecialchars($log['action']); ?></td>
+                                    <td><?php echo htmlspecialchars($log['details']); ?></td>
+                                    <td><?php echo htmlspecialchars($log['ip_address']); ?></td>
+                                    <td><?php echo date('Y-m-d H:i:s', strtotime($log['created_at'])); ?></td>
+                                </tr>
+                            <?php endwhile; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
     </div>
 </body>
+
 </html>

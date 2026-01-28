@@ -47,81 +47,118 @@ $recent_jobs_result = mysqli_query($conn, $recent_jobs_sql);
 closeDBConnection($conn);
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Client Dashboard - UniFreelance</title>
+    <link rel="stylesheet" href="/unifreelance/frontend/assets/css/client.css">
+    <link rel="stylesheet" href="/unifreelance/frontend/assets/css/style.css">
 </head>
+
 <body>
-    <h1>Welcome, <?php echo htmlspecialchars($user['username']); ?>!</h1>
-    <p>Role: Client</p>
-    
-    <!-- Quick Stats -->
-    <div>
-        <h2>Your Stats</h2>
-        <p>Total Jobs Posted: <?php echo $stats['total_jobs']; ?></p>
-        <p>Active Jobs: <?php echo $stats['active_jobs']; ?></p>
-        <p>Completed Jobs: <?php echo $stats['completed_jobs']; ?></p>
-        <p>Total Spent: $<?php echo number_format($stats['total_spent'], 2); ?></p>
-    </div>
-    
-    <!-- Navigation -->
-    <nav>
-        <ul>
-            <li><a href="profile/update_details.php">Update Profile</a></li>
-            <li><a href="profile/upload_id.php">Upload ID</a></li>
-            <li><a href="../jobs/create_job.php">Post New Job</a></li>
-            <li><a href="../jobs/view_jobs.php?type=my">My Jobs</a></li>
-            <li><a href="../applications/view_applications.php">View Applications</a></li>
-            <li><a href="../messages/inbox.php">Messages</a></li>
-            <li><a href="../auth/logout.php">Logout</a></li>
-        </ul>
-    </nav>
-    
-    <!-- Recent Jobs -->
-    <div>
-        <h2>Recent Jobs</h2>
-        <?php if (mysqli_num_rows($recent_jobs_result) > 0): ?>
-            <table border="1">
-                <tr>
-                    <th>Title</th>
-                    <th>Student</th>
-                    <th>Amount</th>
-                    <th>Status</th>
-                    <th>Date</th>
-                    <th>Actions</th>
-                </tr>
-                <?php while ($job = mysqli_fetch_assoc($recent_jobs_result)): ?>
-                    <tr>
-                        <td><?php echo htmlspecialchars($job['title']); ?></td>
-                        <td>
-                            <?php 
-                            if ($job['student_id']) {
-                                $student_conn = getDBConnection();
-                                $student_sql = "SELECT username FROM users WHERE id = '{$job['student_id']}'";
-                                $student_result = mysqli_query($student_conn, $student_sql);
-                                $student = mysqli_fetch_assoc($student_result);
-                                echo htmlspecialchars($student['username']);
-                                closeDBConnection($student_conn);
-                            } else {
-                                echo "Not assigned";
-                            }
-                            ?>
-                        </td>
-                        <td>$<?php echo number_format($job['amount'], 2); ?></td>
-                        <td><?php echo htmlspecialchars($job['status']); ?></td>
-                        <td><?php echo date('Y-m-d', strtotime($job['created_at'])); ?></td>
-                        <td>
-                            <a href="../jobs/edit_job.php?id=<?php echo $job['id']; ?>">Edit</a>
-                            <?php if ($job['status'] == 'completed'): ?>
-                                | <a href="../payments/release.php?job_id=<?php echo $job['id']; ?>">Release Payment</a>
-                            <?php endif; ?>
-                        </td>
-                    </tr>
-                <?php endwhile; ?>
-            </table>
-        <?php else: ?>
-            <p>No jobs yet. <a href="../jobs/create_job.php">Post your first job</a></p>
-        <?php endif; ?>
+    <a href="/unifreelance/" class="home-btn">🏠 Home</a>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1>Welcome, <?php echo htmlspecialchars($user['username']); ?>! 👋</h1>
+                <p>Client Dashboard</p>
+            </div>
+            <div class="header-nav">
+                <a href="profile/update_details.php">Update Profile</a>
+                <a href="../auth/logout.php">Logout</a>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="label">Total Jobs Posted</div>
+                <div class="value"><?php echo $stats['total_jobs']; ?></div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Active Jobs</div>
+                <div class="value"><?php echo $stats['active_jobs']; ?></div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Completed Jobs</div>
+                <div class="value"><?php echo $stats['completed_jobs']; ?></div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Total Spent</div>
+                <div class="value">$<?php echo number_format($stats['total_spent'], 2); ?></div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="section">
+            <h2>Quick Actions</h2>
+            <div class="nav-links">
+                <a href="../jobs/create_job.php">➕ Post New Job</a>
+                <a href="../jobs/view_jobs.php?type=my">📋 My Jobs</a>
+                <a href="../applications/view_applications.php">📝 View Applications</a>
+                <a href="../messages/inbox.php">💬 Messages</a>
+                <a href="profile/upload_id.php">📷 Upload ID</a>
+                <a href="settings/change_password.php">🔐 Change Password</a>
+            </div>
+        </div>
+
+        <!-- Recent Jobs -->
+        <div class="section">
+            <h2>Recent Jobs</h2>
+            <?php if (mysqli_num_rows($recent_jobs_result) > 0): ?>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Student</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php while ($job = mysqli_fetch_assoc($recent_jobs_result)): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($job['title']); ?></td>
+                                <td>$<?php echo number_format($job['amount'], 2); ?></td>
+                                <td><span class="badge badge-<?php echo $job['status']; ?>"><?php echo ucfirst(str_replace('_', ' ', $job['status'])); ?></span></td>
+                                <td>
+                                    <?php
+                                    if ($job['student_id']) {
+                                        $student_conn = getDBConnection();
+                                        $student_sql = "SELECT username FROM users WHERE id = '{$job['student_id']}'";
+                                        $student_result = mysqli_query($student_conn, $student_sql);
+                                        $student = mysqli_fetch_assoc($student_result);
+                                        echo htmlspecialchars($student['username'] ?? 'N/A');
+                                        closeDBConnection($student_conn);
+                                    } else {
+                                        echo "Not assigned";
+                                    }
+                                    ?>
+                                </td>
+                                <td><?php echo date('M d, Y', strtotime($job['created_at'])); ?></td>
+                                <td>
+                                    <a href="../jobs/edit_job.php?id=<?php echo $job['id']; ?>" class="action-btn action-btn-primary">Edit</a>
+                                    <?php if ($job['status'] == 'completed'): ?>
+                                        <a href="../payments/release.php?job_id=<?php echo $job['id']; ?>" class="action-btn action-btn-secondary">Release Payment</a>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                        <?php endwhile; ?>
+                    </tbody>
+                </table>
+            <?php else: ?>
+                <div class="empty-message">
+                    <p>No jobs yet. <a href="../jobs/create_job.php">Post your first job</a></p>
+                </div>
+            <?php endif; ?>
+        </div>
     </div>
 </body>
+
 </html>
